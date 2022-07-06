@@ -4,6 +4,6 @@
     <item
         android:id="@+id/calc_item"
         android:title="Calculator"
-        app:showAsAction="ifRoom"
+        app:showAsAction="a"
         android:icon="@drawable/img"/>
 </menu>
