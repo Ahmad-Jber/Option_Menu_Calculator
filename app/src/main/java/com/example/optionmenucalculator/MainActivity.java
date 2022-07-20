@@ -2,7 +2,11 @@ package com.example.optionmenucalculator;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,32 +15,35 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private AlertDialog dialog;
-    private TextView result;
     private EditText val1,val2;
     private Button sum, sub, multi, divide;
+    private RecyclerView recycler;
+    CalculatorAdapter adapter;
+    ArrayList<Results> results = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        View view = inflater.inflate(R.layout.alert_calculator,null);
-        result = findViewById(R.id.result);
+        View viewOptionMenu = inflater.inflate(R.layout.alert_calculator,null);
         dialog = builder.create();
+        recycler=findViewById(R.id.view);
         dialog.setContentView(R.layout.alert_calculator);
-        val1 = view.findViewById(R.id.val1);
-        val2 = view.findViewById(R.id.val2);
-        sum = view.findViewById(R.id.sum);
-        sub = view.findViewById(R.id.sub);
-        multi = view.findViewById(R.id.multi);
-        divide = view.findViewById(R.id.divide);
-        dialog.setView(view);
+        val1 = viewOptionMenu.findViewById(R.id.val1);
+        val2 = viewOptionMenu.findViewById(R.id.val2);
+        sum = viewOptionMenu.findViewById(R.id.sum);
+        sub = viewOptionMenu.findViewById(R.id.sub);
+        multi = viewOptionMenu.findViewById(R.id.multi);
+        divide = viewOptionMenu.findViewById(R.id.divide);
+        dialog.setView(viewOptionMenu);
         dialog.setTitle("Calculator");
     }
 
@@ -64,7 +71,10 @@ public class MainActivity extends AppCompatActivity {
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                result.setText(new DecimalFormat("#.###").format(sum()));
+                results.add(new Results(Float.parseFloat(val1.getText().toString()),Float.parseFloat(val2.getText().toString()),'+',sum()));
+                recycler.setLayoutManager(new LinearLayoutManager(this));
+                adapter = new CalculatorAdapter(this,results);
+                recycler.setAdapter(adapter);
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
@@ -78,7 +88,10 @@ public class MainActivity extends AppCompatActivity {
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                result.setText(new DecimalFormat("#.###").format(sub()));
+                results.add(new Results(Float.parseFloat(val1.getText().toString()),Float.parseFloat(val2.getText().toString()),'-',sub()));
+                recycler.setLayoutManager(new LinearLayoutManager(this));
+                adapter = new CalculatorAdapter(this,results);
+                recycler.setAdapter(adapter);
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
@@ -92,7 +105,10 @@ public class MainActivity extends AppCompatActivity {
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                result.setText(new DecimalFormat("#.###").format(multi()));
+                results.add(new Results(Float.parseFloat(val1.getText().toString()),Float.parseFloat(val2.getText().toString()),'*',multi()));
+                recycler.setLayoutManager(new LinearLayoutManager(this));
+                adapter = new CalculatorAdapter(this,results);
+                recycler.setAdapter(adapter);
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
@@ -107,7 +123,10 @@ public class MainActivity extends AppCompatActivity {
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else if(Float.parseFloat(val2.getText().toString())==0) val2.setError("Can not divide by 0");
             else{
-                result.setText(new DecimalFormat("#.###").format(divide()));
+                results.add(new Results(Float.parseFloat(val1.getText().toString()),Float.parseFloat(val2.getText().toString()),'/',divide()));
+                recycler.setLayoutManager(new LinearLayoutManager(this));
+                adapter = new CalculatorAdapter(this,results);
+                recycler.setAdapter(adapter);
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
@@ -117,16 +136,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean isEmpty(){
         return val1.getText().toString().equals("")&&val2.getText().toString().equals("");
     }
-    private double sum(){
+    private float sum(){
         return Float.parseFloat(val1.getText().toString())+Float.parseFloat(val2.getText().toString());
     }
-    private double sub(){
+    private float sub(){
         return Float.parseFloat(val1.getText().toString())-Float.parseFloat(val2.getText().toString());
     }
-    private double multi(){
+    private float multi(){
         return Float.parseFloat(val1.getText().toString())*Float.parseFloat(val2.getText().toString());
     }
-    private double divide(){
+    private float divide(){
         return Float.parseFloat(val1.getText().toString())/Float.parseFloat(val2.getText().toString());
     }
 }
