@@ -1,21 +1,21 @@
 package com.example.optionmenucalculator;
 
 public class Results {
-    private float num1,num2,result;
+    private String num1,num2,result;
     private char operator;
 
-    public Results(float num1, float num2, char operator, float result) {
+    public Results(String num1, String num2, char operator, String result) {
         this.num1 = num1;
         this.num2 = num2;
         this.operator = operator;
         this.result = result;
     }
 
-    public float getNum1() {
+    public String getNum1() {
         return num1;
     }
 
-    public float getNum2() {
+    public String getNum2() {
         return num2;
     }
 
@@ -23,7 +23,7 @@ public class Results {
         return operator;
     }
 
-    public float getResult() {
+    public String getResult() {
         return result;
     }
 }

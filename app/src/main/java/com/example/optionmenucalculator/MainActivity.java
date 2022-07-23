@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
-import android.graphics.Color;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,8 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -63,6 +61,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        DBClass db = new DBClass(this);
+        if (!db.cursorToArray(results).isEmpty()){
+            recycler.setLayoutManager(new LinearLayoutManager(this));
+            results.clear();
+            adapter = new CalculatorAdapter(this,db.cursorToArray(results));
+            recycler.setAdapter(adapter);
+        }
         sum.setOnClickListener(view -> {
             if (isEmpty()){
                 val1.setError("Required");
@@ -71,13 +76,16 @@ public class MainActivity extends AppCompatActivity {
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                results.add(new Results(Float.parseFloat(val1.getText().toString()),Float.parseFloat(val2.getText().toString()),'+',sum()));
-                recycler.setLayoutManager(new LinearLayoutManager(this));
-                adapter = new CalculatorAdapter(this,results);
-                recycler.setAdapter(adapter);
+                db.addOperation(new Results(val1.getText().toString(),val2.getText().toString(),'+',new DecimalFormat("#.###").format(sum())));
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
+                if (!db.cursorToArray(results).isEmpty()){
+                    recycler.setLayoutManager(new LinearLayoutManager(this));
+                    results.clear();
+                    adapter = new CalculatorAdapter(this,db.cursorToArray(results));
+                    recycler.setAdapter(adapter);
+                }
             }
         });
         sub.setOnClickListener(view -> {
@@ -88,13 +96,16 @@ public class MainActivity extends AppCompatActivity {
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                results.add(new Results(Float.parseFloat(val1.getText().toString()),Float.parseFloat(val2.getText().toString()),'-',sub()));
-                recycler.setLayoutManager(new LinearLayoutManager(this));
-                adapter = new CalculatorAdapter(this,results);
-                recycler.setAdapter(adapter);
+                db.addOperation(new Results(val1.getText().toString(),val2.getText().toString(),'-',new DecimalFormat("#.###").format(sub())));
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
+                if (!db.cursorToArray(results).isEmpty()){
+                    recycler.setLayoutManager(new LinearLayoutManager(this));
+                    results.clear();
+                    adapter = new CalculatorAdapter(this,db.cursorToArray(results));
+                    recycler.setAdapter(adapter);
+                }
             }
         });
         multi.setOnClickListener(view -> {
@@ -105,13 +116,16 @@ public class MainActivity extends AppCompatActivity {
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                results.add(new Results(Float.parseFloat(val1.getText().toString()),Float.parseFloat(val2.getText().toString()),'*',multi()));
-                recycler.setLayoutManager(new LinearLayoutManager(this));
-                adapter = new CalculatorAdapter(this,results);
-                recycler.setAdapter(adapter);
+                db.addOperation(new Results(val1.getText().toString(),val2.getText().toString(),'*',new DecimalFormat("#.###").format(multi())));
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
+                if (!db.cursorToArray(results).isEmpty()){
+                    recycler.setLayoutManager(new LinearLayoutManager(this));
+                    results.clear();
+                    adapter = new CalculatorAdapter(this,db.cursorToArray(results));
+                    recycler.setAdapter(adapter);
+                }
             }
         });
         divide.setOnClickListener(view -> {
@@ -123,13 +137,16 @@ public class MainActivity extends AppCompatActivity {
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else if(Float.parseFloat(val2.getText().toString())==0) val2.setError("Can not divide by 0");
             else{
-                results.add(new Results(Float.parseFloat(val1.getText().toString()),Float.parseFloat(val2.getText().toString()),'/',divide()));
-                recycler.setLayoutManager(new LinearLayoutManager(this));
-                adapter = new CalculatorAdapter(this,results);
-                recycler.setAdapter(adapter);
+                db.addOperation(new Results(val1.getText().toString(),val2.getText().toString(),'/',new DecimalFormat("#.###").format(divide())));
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
+                if (!db.cursorToArray(results).isEmpty()){
+                    recycler.setLayoutManager(new LinearLayoutManager(this));
+                    results.clear();
+                    adapter = new CalculatorAdapter(this,db.cursorToArray(results));
+                    recycler.setAdapter(adapter);
+                }
             }
         });
     }

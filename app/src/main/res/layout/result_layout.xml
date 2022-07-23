@@ -5,47 +5,50 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="20dp"
-    app:cardCornerRadius="20dp">
+    android:layout_margin="5dp"
+    app:cardCornerRadius="5dp"
+    android:outlineAmbientShadowColor="@color/black">
     <LinearLayout
         android:layout_gravity="center"
-        android:layout_width="100dp"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="20dp">
+        android:padding="8dp">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="28sp"
             tools:text="33"
             android:id="@+id/num1"
-            android:textColor="#555"/>
+            android:textColor="#555"
+            android:textSize="18dp"/>
         <TextView
-            android:layout_width="match_parent"
+            android:layout_gravity="end"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="28sp"
             tools:text="+"
             android:id="@+id/operator"
-            android:textColor="#555"/>
+            android:textColor="#555"
+            android:textSize="18dp"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="28sp"
             tools:text="33"
             android:id="@+id/num2"
-            android:textColor="#555"/>
+            android:textColor="#555"
+            android:layout_marginBottom="10dp"
+            android:textSize="18dp"/>
         <View
             android:id="@+id/view"
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"
+            android:layout_height="1dp"
             android:background="@android:color/darker_gray"
             android:outlineAmbientShadowColor="#555"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="28sp"
             tools:text="33"
             android:id="@+id/result"
-            android:textColor="#555"/>
+            android:textColor="#555"
+            android:textSize="18dp"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
