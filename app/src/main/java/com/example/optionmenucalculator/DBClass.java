@@ -42,11 +42,10 @@ public class DBClass extends SQLiteOpenHelper {
         db.insert("OPERATIONS",null,values);
         Log.e("DB"," The Operation was added");
     }
-    public ArrayList<Operations> showOperations(ArrayList<Operations> result){
-        result.clear();
+    public ArrayList<Operations> getOperations(){
+        ArrayList<Operations> result = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM OPERATIONS", null);
-        cursor.moveToFirst();
          while (!cursor.isAfterLast()){
              result.add(
                      new Operations(

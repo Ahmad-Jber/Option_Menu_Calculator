@@ -46,7 +46,12 @@ public class MainActivity extends AppCompatActivity {
         db = new DBClass(this);
         dialog.setView(viewOptionMenu);
         dialog.setTitle("Calculator");
-        operations = new ArrayList<>();
+        recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
+        operations = db.getOperations();
+        if (!operations.isEmpty()) {
+            adapter = new CalculatorAdapter(this, operations);
+            recycler.setAdapter(adapter);
+        }
         buttonsAction();
     }
 
@@ -68,25 +73,11 @@ public class MainActivity extends AppCompatActivity {
                 SQLiteDatabase database = db.getWritableDatabase();
                 operations.clear();
                 database.execSQL("DELETE FROM OPERATIONS");
-                adapter=getAdapter(db);
                 Log.e("DB ", "The operations was deleted");
                 return super.onOptionsItemSelected(item);
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        adapter = getAdapter(db);
-        recycler.setAdapter(adapter);
-    }
-    private CalculatorAdapter getAdapter(@NonNull DBClass db) {
-        recycler.setLayoutManager(new LinearLayoutManager(this));
-        operations = db.showOperations(operations);
-        adapter = new CalculatorAdapter(this,operations);
-        return adapter;
     }
 
     private boolean isTextEmpty(){
@@ -121,8 +112,6 @@ public class MainActivity extends AppCompatActivity {
                                 new DecimalFormat("#.###").format(sum())
                         )
                 );
-                adapter = getAdapter(db);
-                recycler.setAdapter(adapter);
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
@@ -147,8 +136,6 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
-                adapter = getAdapter(db);
-                recycler.setAdapter(adapter);
             }
         });
         multi.setOnClickListener(view -> {
@@ -170,8 +157,6 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
-                adapter =getAdapter(db);
-                recycler.setAdapter(adapter);
             }
         });
         divide.setOnClickListener(view -> {
@@ -194,8 +179,6 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
-                adapter =getAdapter(db);
-                recycler.setAdapter(adapter);
             }
         });
     }
