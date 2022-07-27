@@ -43,6 +43,7 @@ public class DBClass extends SQLiteOpenHelper {
         Log.e("DB"," The Operation was added");
     }
     public ArrayList<Operations> showOperations(ArrayList<Operations> result){
+        result.clear();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM OPERATIONS", null);
         cursor.moveToFirst();
@@ -56,7 +57,9 @@ public class DBClass extends SQLiteOpenHelper {
                      )
              );
          }
+        Log.e("DB ", "The operations was displayed");
          cursor.close();
+         db.close();
          return result;
     }
 }

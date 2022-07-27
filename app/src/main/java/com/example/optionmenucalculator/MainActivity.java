@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         dialog.setView(viewOptionMenu);
         dialog.setTitle("Calculator");
         operations = new ArrayList<>();
-        database = db.getWritableDatabase();
     }
 
     @Override
@@ -65,9 +65,11 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
             }
             case R.id.delete_history:{
+                database = db.getWritableDatabase();
                 operations.clear();
                 database.execSQL("DELETE FROM OPERATIONS");
                 adapter=getAdapter(db);
+                Log.e("DB ", "The operations was deleted");
                 return super.onOptionsItemSelected(item);
             }
         }
@@ -176,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
 
     private CalculatorAdapter getAdapter(@NonNull DBClass db) {
         recycler.setLayoutManager(new LinearLayoutManager(this));
-        operations.clear();
         operations = db.showOperations(operations);
         adapter = new CalculatorAdapter(this,operations);
         return adapter;
