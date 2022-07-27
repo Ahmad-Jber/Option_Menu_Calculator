@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class CalculatorAdapter extends RecyclerView.Adapter<CalculatorAdapter.ViewHolder> {
-    private Activity activity;
-    private ArrayList<Operations> operationsAL;
+    private final Activity activity;
+    private final ArrayList<Operations> operationsAL;
     public CalculatorAdapter(Activity activity,ArrayList <Operations> operationsAL){
         this.activity = activity;
         this.operationsAL = operationsAL;
@@ -40,7 +40,7 @@ public class CalculatorAdapter extends RecyclerView.Adapter<CalculatorAdapter.Vi
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView num1TV,num2TV, operatorTV,resultTV;
+        private final TextView num1TV,num2TV, operatorTV,resultTV;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             num1TV=itemView.findViewById(R.id.num1);

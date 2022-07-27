@@ -47,7 +47,7 @@ public class DBClass extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM OPERATIONS", null);
         cursor.moveToFirst();
-         while (cursor.moveToNext()){
+         while (!cursor.isAfterLast()){
              result.add(
                      new Operations(
                              cursor.getString(1),
@@ -56,6 +56,7 @@ public class DBClass extends SQLiteOpenHelper {
                              cursor.getString(4)
                      )
              );
+             cursor.moveToNext();
          }
         Log.e("DB ", "The operations was displayed");
          cursor.close();

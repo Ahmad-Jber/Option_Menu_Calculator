@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private DBClass db;
     private CalculatorAdapter adapter;
     private ArrayList<Operations> operations;
-    private SQLiteDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setView(viewOptionMenu);
         dialog.setTitle("Calculator");
         operations = new ArrayList<>();
+        buttonsAction();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
             }
             case R.id.delete_history:{
-                database = db.getWritableDatabase();
+                SQLiteDatabase database = db.getWritableDatabase();
                 operations.clear();
                 database.execSQL("DELETE FROM OPERATIONS");
                 adapter=getAdapter(db);
@@ -81,6 +81,30 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         adapter = getAdapter(db);
         recycler.setAdapter(adapter);
+    }
+    private CalculatorAdapter getAdapter(@NonNull DBClass db) {
+        recycler.setLayoutManager(new LinearLayoutManager(this));
+        operations = db.showOperations(operations);
+        adapter = new CalculatorAdapter(this,operations);
+        return adapter;
+    }
+
+    private boolean isTextEmpty(){
+        return val1.getText().toString().equals("") && val2.getText().toString().equals("");
+    }
+    private float sum(){
+        return Float.parseFloat(val1.getText().toString())+Float.parseFloat(val2.getText().toString());
+    }
+    private float sub(){
+        return Float.parseFloat(val1.getText().toString())-Float.parseFloat(val2.getText().toString());
+    }
+    private float multi(){
+        return Float.parseFloat(val1.getText().toString())*Float.parseFloat(val2.getText().toString());
+    }
+    private float divide(){
+        return Float.parseFloat(val1.getText().toString())/Float.parseFloat(val2.getText().toString());
+    }
+    private void buttonsAction(){
         sum.setOnClickListener(view -> {
             if (isTextEmpty()){
                 val1.setError("Required");
@@ -174,29 +198,5 @@ public class MainActivity extends AppCompatActivity {
                 recycler.setAdapter(adapter);
             }
         });
-    }
-
-    private CalculatorAdapter getAdapter(@NonNull DBClass db) {
-        recycler.setLayoutManager(new LinearLayoutManager(this));
-        operations = db.showOperations(operations);
-        adapter = new CalculatorAdapter(this,operations);
-        return adapter;
-    }
-
-    private boolean isTextEmpty(){
-        return val1.getText().toString().equals("") && val2.getText().toString().equals("");
-    }
-
-    private float sum(){
-        return Float.parseFloat(val1.getText().toString())+Float.parseFloat(val2.getText().toString());
-    }
-    private float sub(){
-        return Float.parseFloat(val1.getText().toString())-Float.parseFloat(val2.getText().toString());
-    }
-    private float multi(){
-        return Float.parseFloat(val1.getText().toString())*Float.parseFloat(val2.getText().toString());
-    }
-    private float divide(){
-        return Float.parseFloat(val1.getText().toString())/Float.parseFloat(val2.getText().toString());
     }
 }
