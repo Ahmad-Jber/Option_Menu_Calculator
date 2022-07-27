@@ -23,8 +23,10 @@ public class MainActivity extends AppCompatActivity {
     private EditText val1,val2;
     private Button sum, sub, multi, divide;
     private RecyclerView recycler;
-    CalculatorAdapter adapter;
-    ArrayList<Results> results = new ArrayList<>();
+    private DBClass db;
+    private CalculatorAdapter adapter;
+    private ArrayList<Operations> operations;
+    private SQLiteDatabase database;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +43,11 @@ public class MainActivity extends AppCompatActivity {
         sub = viewOptionMenu.findViewById(R.id.sub);
         multi = viewOptionMenu.findViewById(R.id.multi);
         divide = viewOptionMenu.findViewById(R.id.divide);
+        db = new DBClass(this);
         dialog.setView(viewOptionMenu);
         dialog.setTitle("Calculator");
+        operations = new ArrayList<>();
+        database = db.getWritableDatabase();
     }
 
     @Override
@@ -54,82 +59,97 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        dialog.show();
+        switch (item.getItemId()){
+            case R.id.calc_item:{
+                dialog.show();
+                return super.onOptionsItemSelected(item);
+            }
+            case R.id.delete_history:{
+                operations.clear();
+                database.execSQL("DELETE FROM OPERATIONS");
+                adapter=getAdapter(db);
+                return super.onOptionsItemSelected(item);
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        DBClass db = new DBClass(this);
-        if (!db.cursorToArray(results).isEmpty()){
-            recycler.setLayoutManager(new LinearLayoutManager(this));
-            results.clear();
-            adapter = new CalculatorAdapter(this,db.cursorToArray(results));
-            recycler.setAdapter(adapter);
-        }
+        adapter = getAdapter(db);
+        recycler.setAdapter(adapter);
         sum.setOnClickListener(view -> {
-            if (isEmpty()){
+            if (isTextEmpty()){
                 val1.setError("Required");
                 val2.setError("Required");
             }
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                db.addOperation(new Results(val1.getText().toString(),val2.getText().toString(),'+',new DecimalFormat("#.###").format(sum())));
+                db.addOperation(
+                        new Operations(
+                                val1.getText().toString(),
+                                val2.getText().toString(),
+                                '+',
+                                new DecimalFormat("#.###").format(sum())
+                        )
+                );
+                adapter = getAdapter(db);
+                recycler.setAdapter(adapter);
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
-                if (!db.cursorToArray(results).isEmpty()){
-                    recycler.setLayoutManager(new LinearLayoutManager(this));
-                    results.clear();
-                    adapter = new CalculatorAdapter(this,db.cursorToArray(results));
-                    recycler.setAdapter(adapter);
-                }
             }
         });
         sub.setOnClickListener(view -> {
-            if (isEmpty()){
+            if (isTextEmpty()){
                 val1.setError("Required");
                 val2.setError("Required");
             }
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                db.addOperation(new Results(val1.getText().toString(),val2.getText().toString(),'-',new DecimalFormat("#.###").format(sub())));
+                db.addOperation(
+                        new Operations(
+                                val1.getText().toString(),
+                                val2.getText().toString(),
+                                '-',
+                                new DecimalFormat("#.###").format(sub())
+                        )
+                );
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
-                if (!db.cursorToArray(results).isEmpty()){
-                    recycler.setLayoutManager(new LinearLayoutManager(this));
-                    results.clear();
-                    adapter = new CalculatorAdapter(this,db.cursorToArray(results));
-                    recycler.setAdapter(adapter);
-                }
+                adapter = getAdapter(db);
+                recycler.setAdapter(adapter);
             }
         });
         multi.setOnClickListener(view -> {
-            if (isEmpty()){
+            if (isTextEmpty()){
                 val1.setError("Required");
                 val2.setError("Required");
             }
             else if (val1.getText().toString().equals("")) val1.setError("Required");
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else{
-                db.addOperation(new Results(val1.getText().toString(),val2.getText().toString(),'*',new DecimalFormat("#.###").format(multi())));
+                db.addOperation(
+                        new Operations(
+                                val1.getText().toString(),
+                                val2.getText().toString(),
+                                '*',
+                                new DecimalFormat("#.###").format(multi())
+                        )
+                );
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
-                if (!db.cursorToArray(results).isEmpty()){
-                    recycler.setLayoutManager(new LinearLayoutManager(this));
-                    results.clear();
-                    adapter = new CalculatorAdapter(this,db.cursorToArray(results));
-                    recycler.setAdapter(adapter);
-                }
+                adapter =getAdapter(db);
+                recycler.setAdapter(adapter);
             }
         });
         divide.setOnClickListener(view -> {
-            if (isEmpty()){
+            if (isTextEmpty()){
                 val1.setError("Required");
                 val2.setError("Required");
             }
@@ -137,22 +157,35 @@ public class MainActivity extends AppCompatActivity {
             else if(val2.getText().toString().equals("")) val2.setError("Required");
             else if(Float.parseFloat(val2.getText().toString())==0) val2.setError("Can not divide by 0");
             else{
-                db.addOperation(new Results(val1.getText().toString(),val2.getText().toString(),'/',new DecimalFormat("#.###").format(divide())));
+                db.addOperation(
+                        new Operations(
+                                val1.getText().toString(),
+                                val2.getText().toString(),
+                                '/',
+                                new DecimalFormat("#.###").format(divide())
+                        )
+                );
                 dialog.dismiss();
                 val1.setText("");
                 val2.setText("");
-                if (!db.cursorToArray(results).isEmpty()){
-                    recycler.setLayoutManager(new LinearLayoutManager(this));
-                    results.clear();
-                    adapter = new CalculatorAdapter(this,db.cursorToArray(results));
-                    recycler.setAdapter(adapter);
-                }
+                adapter =getAdapter(db);
+                recycler.setAdapter(adapter);
             }
         });
     }
-    private boolean isEmpty(){
-        return val1.getText().toString().equals("")&&val2.getText().toString().equals("");
+
+    private CalculatorAdapter getAdapter(@NonNull DBClass db) {
+        recycler.setLayoutManager(new LinearLayoutManager(this));
+        operations.clear();
+        operations = db.showOperations(operations);
+        adapter = new CalculatorAdapter(this,operations);
+        return adapter;
     }
+
+    private boolean isTextEmpty(){
+        return val1.getText().toString().equals("") && val2.getText().toString().equals("");
+    }
+
     private float sum(){
         return Float.parseFloat(val1.getText().toString())+Float.parseFloat(val2.getText().toString());
     }

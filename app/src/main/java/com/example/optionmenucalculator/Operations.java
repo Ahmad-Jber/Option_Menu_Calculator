@@ -1,10 +1,10 @@
 package com.example.optionmenucalculator;
 
-public class Results {
+public class Operations {
     private String num1,num2,result;
     private char operator;
 
-    public Results(String num1, String num2, char operator, String result) {
+    public Operations(String num1, String num2, char operator, String result) {
         this.num1 = num1;
         this.num2 = num2;
         this.operator = operator;

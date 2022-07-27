@@ -13,10 +13,10 @@ import java.util.ArrayList;
 
 public class CalculatorAdapter extends RecyclerView.Adapter<CalculatorAdapter.ViewHolder> {
     private Activity activity;
-    private ArrayList<Results> resultsAL;
-    public CalculatorAdapter(Activity activity,ArrayList <Results> resultsAL){
+    private ArrayList<Operations> operationsAL;
+    public CalculatorAdapter(Activity activity,ArrayList <Operations> operationsAL){
         this.activity = activity;
-        this.resultsAL = resultsAL;
+        this.operationsAL = operationsAL;
     }
     @NonNull
     @Override
@@ -28,15 +28,15 @@ public class CalculatorAdapter extends RecyclerView.Adapter<CalculatorAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.num1TV.setText(String.valueOf(resultsAL.get(position).getNum1()));
-        holder.operatorTV.setText(String.valueOf(resultsAL.get(position).getOperator()));
-        holder.num2TV.setText(String.valueOf(resultsAL.get(position).getNum2()));
-        holder.resultTV.setText(String.valueOf(resultsAL.get(position).getResult()));
+        holder.num1TV.setText(String.valueOf(operationsAL.get(position).getNum1()));
+        holder.operatorTV.setText(String.valueOf(operationsAL.get(position).getOperator()));
+        holder.num2TV.setText(String.valueOf(operationsAL.get(position).getNum2()));
+        holder.resultTV.setText(String.valueOf(operationsAL.get(position).getResult()));
     }
 
     @Override
     public int getItemCount() {
-        return resultsAL.size();
+        return operationsAL.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

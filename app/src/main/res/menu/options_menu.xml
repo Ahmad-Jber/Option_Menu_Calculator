@@ -6,4 +6,10 @@
         android:title="Calculator"
         app:showAsAction="always"
         android:icon="@drawable/img"/>
+    <item
+        android:id="@+id/delete_history"
+        android:title="Delete"
+        app:showAsAction="always"
+        android:icon="@drawable/iconserase"
+        />
 </menu>

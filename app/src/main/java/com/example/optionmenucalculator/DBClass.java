@@ -10,9 +10,9 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 public class DBClass extends SQLiteOpenHelper {
+
     public DBClass(@Nullable Context context) {
         super(context, "OPERATIONS", null, 1);
         Log.e("DB"," The Database was Created");
@@ -32,23 +32,23 @@ public class DBClass extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
 
     }
-    void addOperation(Results result){
+    void addOperation(Operations operations){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("NUM1",result.getNum1());
-        values.put("OPERATOR_SIGN", String.valueOf(result.getOperator()));
-        values.put("NUM2",result.getNum2());
-        values.put("RESULT",result.getResult());
+        values.put("NUM1",operations.getNum1());
+        values.put("OPERATOR_SIGN", String.valueOf(operations.getOperator()));
+        values.put("NUM2",operations.getNum2());
+        values.put("RESULT",operations.getResult());
         db.insert("OPERATIONS",null,values);
         Log.e("DB"," The Operation was added");
     }
-    public ArrayList<Results> cursorToArray(ArrayList<Results> result){
+    public ArrayList<Operations> showOperations(ArrayList<Operations> result){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM OPERATIONS", null);
         cursor.moveToFirst();
-         while (!cursor.isAfterLast()&& cursor.moveToNext()){
+         while (cursor.moveToNext()){
              result.add(
-                     new Results(
+                     new Operations(
                              cursor.getString(1),
                              cursor.getString(3),
                              cursor.getString(2).charAt(0),
