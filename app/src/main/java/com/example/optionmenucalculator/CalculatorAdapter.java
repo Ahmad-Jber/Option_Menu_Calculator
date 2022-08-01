@@ -7,17 +7,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 public class CalculatorAdapter extends RecyclerView.Adapter<CalculatorAdapter.ViewHolder> {
-    private final Activity activity;
-    private final ArrayList<Operations> operationsAL;
-    public CalculatorAdapter(Activity activity,ArrayList <Operations> operationsAL){
+    private Activity activity;
+    private ArrayList<Operations> operationsAL;
+    public CalculatorAdapter(Activity activity){
         this.activity = activity;
+    }
+
+    public void setArrayList(ArrayList<Operations> operationsAL) {
         this.operationsAL = operationsAL;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

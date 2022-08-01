@@ -46,8 +46,9 @@ public class DBClass extends SQLiteOpenHelper {
         ArrayList<Operations> result = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM OPERATIONS", null);
-         while (!cursor.isAfterLast()){
-             result.add(
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()){
+            result.add(
                      new Operations(
                              cursor.getString(1),
                              cursor.getString(3),
@@ -55,11 +56,17 @@ public class DBClass extends SQLiteOpenHelper {
                              cursor.getString(4)
                      )
              );
-             cursor.moveToNext();
-         }
+            cursor.moveToNext();
+        }
         Log.e("DB ", "The operations was displayed");
          cursor.close();
          db.close();
          return result;
+    }
+    public void deleteOperations(){
+        SQLiteDatabase database = this.getWritableDatabase();
+        database.execSQL("DELETE FROM OPERATIONS");
+        database.close();
+        Log.e("DB ", "The operations was deleted");
     }
 }

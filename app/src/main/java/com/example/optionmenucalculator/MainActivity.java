@@ -2,20 +2,25 @@ package com.example.optionmenucalculator;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.AnimationSet;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View viewOptionMenu = inflater.inflate(R.layout.alert_calculator,null);
+        operations = new ArrayList<>();
         dialog = builder.create();
         recycler=findViewById(R.id.view);
         dialog.setContentView(R.layout.alert_calculator);
@@ -46,13 +52,16 @@ public class MainActivity extends AppCompatActivity {
         db = new DBClass(this);
         dialog.setView(viewOptionMenu);
         dialog.setTitle("Calculator");
+        adapter = new CalculatorAdapter(this);
         recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
-        operations = db.getOperations();
-        if (!operations.isEmpty()) {
-            adapter = new CalculatorAdapter(this, operations);
-            recycler.setAdapter(adapter);
-        }
         buttonsAction();
+        adapter.setArrayList(db.getOperations());
+        recycler.setAdapter(adapter);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
     }
 
     @Override
@@ -70,18 +79,16 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
             }
             case R.id.delete_history:{
-                SQLiteDatabase database = db.getWritableDatabase();
+                db.deleteOperations();
                 operations.clear();
-                database.execSQL("DELETE FROM OPERATIONS");
-                Log.e("DB ", "The operations was deleted");
-                return super.onOptionsItemSelected(item);
+                recycler.setAdapter(null);
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean isTextEmpty(){
-        return val1.getText().toString().equals("") && val2.getText().toString().equals("");
+    private boolean isEmpty(TextView t1){
+        return t1.getText().toString().equals("");
     }
     private float sum(){
         return Float.parseFloat(val1.getText().toString())+Float.parseFloat(val2.getText().toString());
@@ -96,90 +103,63 @@ public class MainActivity extends AppCompatActivity {
         return Float.parseFloat(val1.getText().toString())/Float.parseFloat(val2.getText().toString());
     }
     private void buttonsAction(){
-        sum.setOnClickListener(view -> {
-            if (isTextEmpty()){
-                val1.setError("Required");
-                val2.setError("Required");
-            }
-            else if (val1.getText().toString().equals("")) val1.setError("Required");
-            else if(val2.getText().toString().equals("")) val2.setError("Required");
-            else{
-                db.addOperation(
-                        new Operations(
-                                val1.getText().toString(),
-                                val2.getText().toString(),
-                                '+',
-                                new DecimalFormat("#.###").format(sum())
-                        )
-                );
-                dialog.dismiss();
-                val1.setText("");
-                val2.setText("");
-            }
-        });
-        sub.setOnClickListener(view -> {
-            if (isTextEmpty()){
-                val1.setError("Required");
-                val2.setError("Required");
-            }
-            else if (val1.getText().toString().equals("")) val1.setError("Required");
-            else if(val2.getText().toString().equals("")) val2.setError("Required");
-            else{
-                db.addOperation(
-                        new Operations(
-                                val1.getText().toString(),
-                                val2.getText().toString(),
-                                '-',
-                                new DecimalFormat("#.###").format(sub())
-                        )
-                );
-                dialog.dismiss();
-                val1.setText("");
-                val2.setText("");
-            }
-        });
-        multi.setOnClickListener(view -> {
-            if (isTextEmpty()){
-                val1.setError("Required");
-                val2.setError("Required");
-            }
-            else if (val1.getText().toString().equals("")) val1.setError("Required");
-            else if(val2.getText().toString().equals("")) val2.setError("Required");
-            else{
-                db.addOperation(
-                        new Operations(
-                                val1.getText().toString(),
-                                val2.getText().toString(),
-                                '*',
-                                new DecimalFormat("#.###").format(multi())
-                        )
-                );
-                dialog.dismiss();
-                val1.setText("");
-                val2.setText("");
-            }
-        });
+        sum.setOnClickListener(view -> checkOperation('+'));
+        sub.setOnClickListener(view -> checkOperation('-'));
+        multi.setOnClickListener(view -> checkOperation('*'));
         divide.setOnClickListener(view -> {
-            if (isTextEmpty()){
+            if (val2.getText().toString().equals("0")){
+                val2.setError("Can not divide on 0");
+            }
+            else
+                checkOperation('/');
+        });
+    }
+    private boolean validation(){
+        return !isEmpty(val1) && !isEmpty(val2);
+    }
+    private void operations(char c, float result){
+        Operations operation = new Operations(
+                val1.getText().toString(),
+                val2.getText().toString(),
+                c,
+                new DecimalFormat("#.###").format(result)
+        );
+        db.addOperation(operation);
+        operations.add(operation);
+        adapter.setArrayList(operations);
+        recycler.setAdapter(adapter);
+        dialog.dismiss();
+        val1.setText("");
+        val2.setText("");
+    }
+    private void checkOperation(char c){
+        if (validation()){
+            switch (c) {
+                case '+': {
+                    operations('+', sum());
+                    break;
+                }
+                case '-': {
+                    operations('-', sub());
+                    break;
+                }
+                case '*': {
+                    operations('*', multi());
+                    break;
+                }
+                case '/': {
+                    operations('/', divide());
+                    break;
+                }
+            }
+        }
+        else{
+            if (isEmpty(val1)){
                 val1.setError("Required");
+            }
+            if (isEmpty(val2)){
                 val2.setError("Required");
             }
-            else if (val1.getText().toString().equals("")) val1.setError("Required");
-            else if(val2.getText().toString().equals("")) val2.setError("Required");
-            else if(Float.parseFloat(val2.getText().toString())==0) val2.setError("Can not divide by 0");
-            else{
-                db.addOperation(
-                        new Operations(
-                                val1.getText().toString(),
-                                val2.getText().toString(),
-                                '/',
-                                new DecimalFormat("#.###").format(divide())
-                        )
-                );
-                dialog.dismiss();
-                val1.setText("");
-                val2.setText("");
-            }
-        });
+        }
     }
 }
