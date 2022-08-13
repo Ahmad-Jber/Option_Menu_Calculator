@@ -55,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
         adapter = new CalculatorAdapter(this);
         recycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         buttonsAction();
-        adapter.setArrayList(db.getOperations());
+        operations=db.getOperations();
+        adapter.setArrayList(operations);
         recycler.setAdapter(adapter);
     }
 
@@ -81,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
             case R.id.delete_history:{
                 db.deleteOperations();
                 operations.clear();
-                recycler.setAdapter(null);
+                adapter.notifyDataSetChanged();
+                return super.onOptionsItemSelected(item);
             }
         }
         return super.onOptionsItemSelected(item);
@@ -126,8 +128,7 @@ public class MainActivity extends AppCompatActivity {
         );
         db.addOperation(operation);
         operations.add(operation);
-        adapter.setArrayList(operations);
-        recycler.setAdapter(adapter);
+        adapter.notifyItemInserted(adapter.getItemCount());
         dialog.dismiss();
         val1.setText("");
         val2.setText("");
